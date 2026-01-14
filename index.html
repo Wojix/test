@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Gist Full Loader</title>
+</head>
+<body>
+<script>
+const GIST_RAW_URL = 'https://gist.githubusercontent.com/Wojix/5b800072f296714ec9c730bfa40a6e44/raw/f33b933d33462ac8aa3f30f34044eae404bd637c/index.html';
+
+async function loadGist() {
+    const res = await fetch(GIST_RAW_URL);
+    const html = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    document.head.innerHTML = doc.head.innerHTML;
+    document.body.innerHTML = doc.body.innerHTML;
+
+    const scripts = document.querySelectorAll('script');
+    scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        if (oldScript.src) {
+            newScript.src = oldScript.src;
+            newScript.async = false;
+        } else {
+            newScript.textContent = oldScript.textContent;
+        }
+        document.body.appendChild(newScript);
+        oldScript.remove();
+    });
+}
+
+loadGist();
+</script>
+</body>
+</html>
